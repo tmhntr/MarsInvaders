@@ -22,28 +22,32 @@ icon = pygame.image.load('Assets/mars-2.png')
 pygame.display.set_icon(icon)
 
 #Player
-playerImg = pygame.image.load('Assets/spaceship.png')
+player_img = pygame.image.load('Assets/spaceship.png')
 playerX = 370
 playerY = 480
 playerX_change = 0
 playerY_change = 0
 
 #Foe
-foeImg = pygame.image.load('Assets/alien-2.png')
+foe_img = pygame.image.load('Assets/alien-2.png')
 foeX = random.randint(0, 800)
 foeY = random.randint(50, 150)
 foeX_change = 0.3
 foeY_change = 10
 
+#Background resisizing
+back_img = pygame.image.load('Assets/marsat4.png')
+back_img = pygame.transform.scale(back_img, (800, 600))
+
 def player(x, y):
-    screen.blit(playerImg, (x, y)) #blit means to draw
+    screen.blit(player_img, (x, y)) #blit means to draw
 
 def foe(x, y):
-    screen.blit(foeImg, (x, y)) #blit means to draw
+    screen.blit(foe_img, (x, y)) #blit means to draw
 
 #Game loop
 running = True
-speed = 0.5
+speed = 5
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -68,6 +72,9 @@ while running:
     #RGB - Red, Green, Blue
     screen.fill((75, 32, 16))
 
+    #Draw background
+    screen.blit(back_img, (0, 0))
+
     #5 = 5 + -0.1 -> 5 = 5 - 0.1
     #5 = 5 + 0.1
 
@@ -90,10 +97,10 @@ while running:
     foeX += foeX_change
     
     if foeX <= 0:
-        foeX_change = 0.3
+        foeX_change = 5
         foeY += foeY_change
     elif foeX >= 736: #subtracting 64 from 800
-        foeX_change = -0.3
+        foeX_change = -5
         foeY += foeY_change
     
 
