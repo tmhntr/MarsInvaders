@@ -13,8 +13,9 @@ class Foe:
         screen.blit(self.img, (self.x, self.y))
 
     def update(self):
-        speed_increase = 0.01
-        # foe movement and boundaries
+        speed_increase = 0.1
+
+        #Foe movement and boundaries
         self.x += self.x_change
         
         if self.x <= 0:

@@ -1,6 +1,7 @@
 import pygame
 import random
 import math 
+from pygame import mixer
 
 from foe import Foe
 
@@ -26,6 +27,10 @@ playerY_change = 0
 back_img = pygame.image.load('Assets/marsat4.png')
 back_img = pygame.transform.scale(back_img, (800, 600))
 
+#Background music 
+mixer.music.load('Assets/music.wav')
+mixer.music.play(-1) #plays music in loop
+
 #Bullet
 bullet_img = pygame.image.load('Assets/bullet.png')
 bullet_img = pygame.transform.rotate(bullet_img, 90)
@@ -38,7 +43,16 @@ bulletY_change = 10
 bullet_state = "ready"
 #Fire - The bullet is currently moving
 
+#Score
 score = 0
+font = pygame.font.Font('Assets/PLANK___.ttf', 32)
+
+textX = 10
+textY = 10
+
+def show_score(x, y):
+    score_box = font.render("Score: " + str(score), True, (255, 0, 255))
+    screen.blit(score_box, (x, y))
 
 def player(x, y):
     screen.blit(player_img, (x, y)) #blit means to draw
@@ -82,6 +96,8 @@ while running:
             #check for fire bullet
             if event.key == pygame.K_SPACE:
                 if bullet_state is "ready":
+                    bullet_sound = mixer.Sound('Assets/laser.wav')
+                    bullet_sound.play()
                     bulletX = playerX
                     fire_bullet(bulletX, bulletY)
         if event.type == pygame.KEYUP:
@@ -128,10 +144,11 @@ while running:
     for foe in foe_list:
         #Collision
         if isCollision(foe.x, foe.y, bulletX, bulletY):
+            explosion_sound = mixer.Sound('Assets/explosion.wav')
+            explosion_sound.play()
             bulletY = 480
             bullet_state = "ready"
             score += 1
-            print(score)
             foe_list.remove(foe)
             foe_list.append(Foe())
             
@@ -148,6 +165,7 @@ while running:
     
 
     player(playerX, playerY)
+    show_score(textX, textY)
     for foe in foe_list:
         foe.draw(screen)
     pygame.display.flip()
