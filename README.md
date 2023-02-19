@@ -4,4 +4,4 @@ By Dory and Tim <3
 
 ## Features to add
 
-- [ ] Alien speeds up as he approaches ship
+- [x] Alien speeds up as he approaches ship

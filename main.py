@@ -1,14 +1,8 @@
 import pygame
 import random
-from pygame.locals import *
+import math 
 
-class Foe(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.image.load('Assets/alien-2.png')
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+from foe import Foe
 
 #initilze the pygame
 pygame.init()
@@ -28,26 +22,48 @@ playerY = 480
 playerX_change = 0
 playerY_change = 0
 
-#Foe
-foe_img = pygame.image.load('Assets/alien-2.png')
-foeX = random.randint(0, 800)
-foeY = random.randint(50, 150)
-foeX_change = 0.3
-foeY_change = 10
-
 #Background resisizing
 back_img = pygame.image.load('Assets/marsat4.png')
 back_img = pygame.transform.scale(back_img, (800, 600))
 
+#Bullet
+bullet_img = pygame.image.load('Assets/bullet.png')
+bullet_img = pygame.transform.rotate(bullet_img, 90)
+bullet_img = pygame.transform.scale(bullet_img, (64, 64))
+bulletX = 0
+bulletY = 480
+bulletX_change = 0
+bulletY_change = 10
+#Ready - You can't see the bullet on the screen
+bullet_state = "ready"
+#Fire - The bullet is currently moving
+
+score = 0
+
 def player(x, y):
     screen.blit(player_img, (x, y)) #blit means to draw
 
-def foe(x, y):
-    screen.blit(foe_img, (x, y)) #blit means to draw
+# def foe(x, y):
+#     screen.blit(foe_img, (x, y)) #blit means to draw
+
+foe_list = []
+
+for i in range(5):
+    foe_list.append(Foe())
+
+def fire_bullet(x, y):
+    global bullet_state
+    bullet_state = "fire"
+    screen.blit(bullet_img, (x, y + 10))
+
+def isCollision(foeX, foeY, bulletX, bulletY):
+    distance = math.sqrt(math.pow(foeX - bulletX, 2) + (math.pow(foeY - bulletY, 2)))
+    return (distance < 27)
 
 #Game loop
 running = True
 speed = 5
+speed_increase = 0.3
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -63,6 +79,11 @@ while running:
                 playerY_change = -speed
             if event.key == pygame.K_DOWN:
                 playerY_change = speed
+            #check for fire bullet
+            if event.key == pygame.K_SPACE:
+                if bullet_state is "ready":
+                    bulletX = playerX
+                    fire_bullet(bulletX, bulletY)
         if event.type == pygame.KEYUP:
             #keystroke has been released
             if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
@@ -93,17 +114,40 @@ while running:
     elif playerY >= 536: #subtracting 64 from 600
         playerY = 536
 
-    # foe movement and boundaries
-    foeX += foeX_change
-    
-    if foeX <= 0:
-        foeX_change = 5
-        foeY += foeY_change
-    elif foeX >= 736: #subtracting 64 from 800
-        foeX_change = -5
-        foeY += foeY_change
+    for foe in foe_list:
+        foe.update()
+
+    #Bullet movement
+    if bulletY <= 0:
+        bulletY = 480
+        bullet_state = "ready"
+    if bullet_state is "fire":
+        fire_bullet(bulletX, bulletY)
+        bulletY -= bulletY_change
+
+    for foe in foe_list:
+        #Collision
+        if isCollision(foe.x, foe.y, bulletX, bulletY):
+            bulletY = 480
+            bullet_state = "ready"
+            score += 1
+            print(score)
+            foe_list.remove(foe)
+            foe_list.append(Foe())
+            
+
+    # #Collision
+    # if isCollision(foeX, foeY, bulletX, bulletY):
+    #     bulletY = 480
+    #     bullet_state = "ready"
+    #     score += 1
+    #     print(score)
+    #     foeX_change = 3
+    #     foeX = random.randint(0, 735)
+    #     foeY = random.randint(50, 150)
     
 
     player(playerX, playerY)
-    foe(foeX, foeY)
+    for foe in foe_list:
+        foe.draw(screen)
     pygame.display.flip()
