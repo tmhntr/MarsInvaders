@@ -62,8 +62,8 @@ def isCollision(foeX, foeY, bulletX, bulletY):
 
 #Game loop
 running = True
-speed = 5
-speed_increase = 0.1
+speed = 2
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
