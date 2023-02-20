@@ -50,15 +50,32 @@ font = pygame.font.Font('Assets/PLANK___.ttf', 32)
 textX = 10
 textY = 10
 
+#Game Over
+over_font = pygame.font.Font('Assets/PLANK___.ttf', 64)
+
+
 def show_score(x, y):
     score_box = font.render("Score: " + str(score), True, (255, 0, 255))
     screen.blit(score_box, (x, y))
 
+def game_over_text():
+    over_text = font.render("GAME OVER", True, (255, 0, 255))
+    screen.blit(over_text, (280, 250))
+    
 def player(x, y):
     screen.blit(player_img, (x, y)) #blit means to draw
 
 # def foe(x, y):
 #     screen.blit(foe_img, (x, y)) #blit means to draw
+
+isOver = False
+
+def game_over():
+    global isOver
+    isOver = True
+    mixer.music.stop()
+    mixer.music.load('Assets/sfx-defeat7.wav')
+    mixer.music.play()
 
 foe_list = []
 
@@ -78,6 +95,7 @@ def isCollision(foeX, foeY, bulletX, bulletY):
 running = True
 speed = 2
 
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -95,7 +113,7 @@ while running:
                 playerY_change = speed
             #check for fire bullet
             if event.key == pygame.K_SPACE:
-                if bullet_state is "ready":
+                if bullet_state == "ready":
                     bullet_sound = mixer.Sound('Assets/laser.wav')
                     bullet_sound.play()
                     bulletX = playerX
@@ -133,11 +151,24 @@ while running:
     for foe in foe_list:
         foe.update()
 
+    #checking for game over
+    if isOver == False:
+        for i in range(5):
+            if foe_list[i].y  > 410:
+                game_over()
+                for j in range(5):
+                    foe_list[j].y = 2000
+                game_over_text()
+                break  
+    else:
+        game_over_text()  
+
+
     #Bullet movement
     if bulletY <= 0:
         bulletY = 480
         bullet_state = "ready"
-    if bullet_state is "fire":
+    if bullet_state == "fire":
         fire_bullet(bulletX, bulletY)
         bulletY -= bulletY_change
 
@@ -169,3 +200,5 @@ while running:
     for foe in foe_list:
         foe.draw(screen)
     pygame.display.flip()
+    
+    
